@@ -3,35 +3,43 @@ import { connect } from 'react-redux'
 import { getTransactions } from './action.js'
 const ethers = require('ethers')
 
-// https://codepen.io/focuswish/pen/qqGXMZ
+const monospace = {
+  fontFamily: 'monospace',
+}
+
+
+// Table and TableRow from https://codepen.io/focuswish/pen/qqGXMZ
 class TableRow extends React.Component {
   render() {
     const {
       data
     } = this.props;
     const row = data.map((data) =>
-    <tr key={data.hash}>
-      <td key={data.from}>{data.from}</td>
-      <td key={data.to}>{data.to}</td>
-      <td key={data.value._hex}>{ethers.utils.formatEther(data.value._hex)}</td>
-    </tr>
+      <tr key={data.hash} style={monospace}>
+        <td key={data.from}>{data.from}</td>
+        <td key={data.to}>{data.to}</td>
+        <td key={data.value._hex}>{ethers.utils.formatEther(data.value._hex)}</td>
+      </tr>
     );
-    return (
-      <span>{row}</span>
-    );
+    return row
+
   }
 }
 
 class Table extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
-    return (
-      <table>
-        <TableRow data={this.props.data} />
-      </table>
-    );
+    if (this.props.data.length > 0) {
+      return (
+        <table>
+          <tbody>
+            <tr><td>From</td><td>To</td><td>Amount (ETH)</td></tr>
+            <TableRow data={this.props.data} />
+          </tbody>
+        </table>
+      );
+    } else {
+      return null;
+    }
   }
 }
 
@@ -40,7 +48,6 @@ class TransactionList extends Component {
     let etherscanProvider = new ethers.providers.EtherscanProvider();
 
     etherscanProvider.getHistory(this.props.address).then((history) => {
-      console.log(history)
       this.props.onGetTx(history);
     });
   }
